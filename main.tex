@@ -1,0 +1,53 @@
+\documentclass[9pt,a4paper,oneside,hidelinks,aspectratio=169]{beamer}
+\usepackage[outputdir=build]{minted}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{datetime}
+\usepackage{lmodern}
+\usepackage{graphicx}
+
+\usetheme[progressbar=frametitle]{metropolis}
+\setbeamertemplate{section in toc}[sections numbered]
+
+\title{Accelerating Halide on an FPGA by using CIRCT and Calyx as an intermediate step to go from a high-level and software-centric IRs down to RTL}
+\date{May 15, 2023}
+\author{Sergi Granell Escalfet}
+\institute[Facultat d’Informàtica de Barcelona] {
+  Master Degree in Innovation and Research in Informatics - High Performance Computing \\
+  Facultat d’Informàtica de Barcelona \\
+  Universitat Politècnica de Catalunya - BarcelonaTech
+}
+
+\pgfdeclareimage[height=0.6cm]{university-logo}{img/logo-upc-fib.png}
+\logo{\pgfputat{\pgfxy(-1.4,-1.0)}{\pgfbox[center,base]{\pgfuseimage{university-logo}}}}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}
+\frametitle{Table of Contents}
+\tableofcontents
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}{Image and array processing}
+
+\begin{itemize}
+  \item Image processing and array processing play an essential role in modern life:
+  \begin{itemize}
+    \item Applying filters to the images that we upload to social media
+    \item Running object detection algorithms on self-driving cars
+  \end{itemize}
+  \item $\uparrow$ Sophistication modern image processing pipelines, resolution image sensors, real-time video processing $\implies$ $\uparrow$ demand for highly efficient image processing pipeline implementations
+  \item Diversity of targets: from a small device such as a smartphone, smartwatch or edge device to large data center and HPC systems
+  \item Optimizing these algorithms can be complex and often results in non-portable code
+\end{itemize}
+
+\end{frame}
+
+\section{Second Section}
+
+\end{document}
