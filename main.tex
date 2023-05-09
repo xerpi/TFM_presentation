@@ -6,6 +6,8 @@
 \usepackage{datetime}
 \usepackage{lmodern}
 \usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage{xcolor}
 
 \usetheme[progressbar=frametitle]{metropolis}
 \setbeamertemplate{section in toc}[sections numbered]
@@ -34,20 +36,42 @@
 \section{Introduction}
 
 \begin{frame}{Image and array processing}
-
-\begin{itemize}
-  \item Image processing and array processing play an essential role in modern life:
   \begin{itemize}
-    \item Applying filters to the images that we upload to social media
-    \item Running object detection algorithms on self-driving cars
+    \item Image processing and array processing play an essential role in modern life:
+    \begin{itemize}
+      \item Applying filters to the images that we upload to social media
+      \item Running object detection algorithms on self-driving cars
+    \end{itemize}
+    \item $\uparrow$ \textbf{Sophistication} modern image processing pipelines, resolution image sensors, real-time video processing $\implies$ $\uparrow$ demand for highly \textbf{efficient} image processing pipeline implementations
+    \item \textbf{Diversity} of targets: from a small device such as a smartphone, smartwatch or edge device to large data center and HPC systems
+    \item Optimizing these algorithms can be \textbf{complex} and often results in \textbf{non-portable code}
+    \begin{itemize}
+      \item Hand-tuned C and assembly for a specific architecture
+      \item Implementations optimized for an x86 multicore and a modern GPU have little resemblance
+    \end{itemize}
   \end{itemize}
-  \item $\uparrow$ Sophistication modern image processing pipelines, resolution image sensors, real-time video processing $\implies$ $\uparrow$ demand for highly efficient image processing pipeline implementations
-  \item Diversity of targets: from a small device such as a smartphone, smartwatch or edge device to large data center and HPC systems
-  \item Optimizing these algorithms can be complex and often results in non-portable code
-\end{itemize}
-
 \end{frame}
 
-\section{Second Section}
+\begin{frame}{Domain Specific Languages (DSLs)}
+  \begin{itemize}
+    \item DSLs: programming languages specialized to a \textbf{particular application domain}
+    \item \textbf{Abstraction}: they provide a higher level of abstraction tailored to the specific domain
+    \begin{itemize}
+      \item Making it easier for developers to express complex concepts and ideas in a concise and natural way
+   \end{itemize}
+   \item \textbf{Expressiveness}: by focusing on a specific domain, DSLs enable developers to express their intent more directly, resulting in more readable and maintainable code
+   \item \textbf{Productivity}: they simplify the development process. Focus on solving domain-specific problems rather than low-level implementation details
+   \item \textbf{Performance}: they can be optimized for the specific domain, potentially allowing more efficient execution and better performance
+   \item For the image/array processing application domain $\implies$ \textbf{Halide}
+  \end{itemize}
+\end{frame}
+
+\section{Halide}
+
+\begin{frame}{Halide}
+  \begin{itemize}
+    \item Main idea: \textbf{decouple} the \textcolor{blue}{\textbf{\textit{algorithm}}} (\textquote{what needs to be computed}) definition from its \textcolor{blue}{\textbf{\textit{schedule}}} (\textquote{how it should be computed})
+  \end{itemize}
+\end{frame}
 
 \end{document}
