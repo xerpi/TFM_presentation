@@ -1,4 +1,4 @@
-\documentclass[9pt,a4paper,oneside,hidelinks,aspectratio=169,dvipsnames]{beamer}
+\documentclass[8pt,a4paper,oneside,hidelinks,aspectratio=169,dvipsnames]{beamer}
 \usepackage[outputdir=build]{minted}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -93,7 +93,7 @@
       \centering
       \begin{subfigure}[H]{.4\textwidth}
         \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{4.2}{3}]{cpp}{fig/halide_manual_opt.cpp}
-        \caption*{Hand-optimized C\texttt{++}. $x11$ faster. 0.9 ms/megapixel.}
+        \caption*{Hand-optimized C\texttt{++}. $\times11$ faster than naive impl., 0.9 ms/megapixel.}
       \end{subfigure}
       $\implies$
       \begin{subfigure}[H]{.4\textwidth}
@@ -245,7 +245,7 @@
     \item \textbf{Sliding window optimization and storage folding}: traverses the loop nests seeking opportunities for sliding window optimizations (when the results of a function are to be stored by a serial loop at a higher loop nesting level than its computation).
     \item \textbf{Flattening}: multi-dimensional loads, stores, and allocations are flattened into their linear single-dimensional equivalent.
     \item \textbf{Vectorization and unrolling}: converts loops that were scheduled as vectorized or unrolled into the corresponding loops. During vectorization, occurrences of a loop index are replaced with a special value $ramp(n)$ which represents the vector $[0, 1, \ldots, n-1]$.
-    \item \textbf{Back-end code generation}: low-level optimizations are performed and machine code is emitted for the resulting pipeline. The primary backends use LLVM for code generation. After running constant-folding and dead-code elimination passes the Halide IR, it is ready to be lowered (\code{CodeGen} backend).
+    \item \textbf{Back-end code generation}: low-level optimizations are performed and machine code is emitted for the resulting pipeline. After running constant-folding and dead-code elimination passes, the Halide IR is ready to be lowered with a \code{CodeGen} backend. The primary backends use LLVM for code generation.
   \end{enumerate}
 
   \begin{figure}[H]
@@ -256,8 +256,45 @@
 \end{frame}
 
 \begin{frame}{Halide IR}
-  \fontsize{6pt}{7.2}\selectfont
+  \begin{itemize}
+    \item Halide IR nodes have an explicit type described by \codecpp{enum IRNodeType}. Examples:
+          \begin{itemize}
+            \item \codecpp{IntImm} to create integer immediates
+            \item \code{Add} to represent additions
+            \item \codecpp{Store} and \code{Load} to perform memory accesses
+          \end{itemize}
+    \item \codecpp{struct IRNode}: \codecpp{IRNodeType} + reference count. Virtual method \codecpp{accept} to implement the \textbf{visitor pattern}.
+    \item Two kinds of nodes, analogously to C:
+          \begin{itemize}
+            \item \textbf{Expressions} (\codecpp{ExprNode}): represent some value and have some type (e.g. \codecpp{x + 3})
+            \item \textbf{Statements} (\codecpp{StmtNode}): side-effecting pieces of code that do not represent a value (e.g. \codecpp{assert(x > 3)}).
+          \end{itemize}
+    \item Type system: signed and unsigned ints, IEEE fp numbers, opaque pointers (like \codecpp{void *}) and \code{bfloat}
+  \end{itemize}
+  \vspace*{0.1cm}
+  \begin{figure}[H]
+    \makebox[\linewidth]{
+      \begin{minipage}[H]{\textwidth}
+        \centering
+        \begin{subfigure}[t]{.45\textwidth}
+          \centering
+          \codecpp{IntImm} node definition
+          \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{4.5}{4}]{cpp}{fig/halide_IntImm_node.cpp}
+        \end{subfigure}
+        \begin{subfigure}[t]{.475\textwidth}
+          \centering
+          \codecpp{IfThenElse} node definition
+          \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{4.5}{4}]{cpp}{fig/halide_IfThenElse_node.cpp}
+          \vspace{0.4cm}
+        \end{subfigure}
+      \end{minipage}
+    }
+  \end{figure}
+\end{frame}
 
+\section{MLIR}
+
+\begin{frame}{MLIR}
 
 \end{frame}
 
