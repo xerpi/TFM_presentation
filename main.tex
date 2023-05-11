@@ -294,8 +294,67 @@
 
 \section{MLIR}
 
-\begin{frame}{MLIR}
+\begin{frame}{\raisebox{-0.25\height}{\includegraphics[height=0.5cm]{img/mlir-identity-09.png}}}
+  \begin{itemize}
+    \item Multi-Level Intermediate Representation (MLIR): open-source compiler infrastructure project; provides common IR to represent \textbf{multiple levels of abstractions} maintaining a \textbf{unified interface}.
+    \item Address challenges in building compilers and optimizing code generation for modern high-performance computing and machine-learning applications.
+          \begin{itemize}
+            \item Many compilation and system design problems are better modeled at a \textbf{higher-} or \textbf{lower-level abstraction}. Languages that use LLVM end up developing their IR to solve domain-specific problems. ML frameworks also use domain-specific abstractions (\textquote{ML graphs}).
+            \item Makes it \textbf{easy} to define and \textbf{introduce new abstraction levels} and provides the infrastructure to use them to solve common compiler engineering problems.
+          \end{itemize}
+    \item MLIR infrastructure provides:
+          \begin{enumerate}
+            \item Standardized Static Single Assignment (\textbf{SSA})-based IR data structures,
+            \item Declarative system for defining IR \textbf{dialects}, and
+            \item Wide range of common infrastructure: documentation, parsing and printing logic, multithreaded compilation support, \textbf{pass management}, etc.
+          \end{enumerate}
+  \end{itemize}
+\end{frame}
 
+\begin{frame}{\raisebox{-0.25\height}{\includegraphics[height=0.5cm]{img/mlir-identity-09.png}} Dialects}
+  \begin{itemize}
+    \item \textbf{Dialect}: collection of related \textbf{operations}, \textbf{attributes} and \textbf{types} used to represent a particular domain.
+          \begin{itemize}
+            \item \textit{Attributes}: mechanism for specifying constant data on operations in places where a variable is never allowed (such as the comparison predicate of a \code{cmpi} operation).
+          \end{itemize}
+    \item MLIR allows for multiple dialects (even those outside of the main code tree) to \textbf{co-exist} together within one \textit{module}. Dialects are produced and consumed by certain \textbf{\textit{passes}}.
+    \item Examples:
+          \begin{itemize}
+            \item \textbf{\textit{Arith}}: arithmetic dialect, holds basic integer and floating point mathematical operations which include: unary, binary, and ternary arithmetic ops, bitwise and shift ops, cast ops, and compare ops. Operations in this dialect also accept vectors and tensors of integers or floats.
+            \item \textbf{\textit{Func}}: creation of high-level function abstractions and function calls.
+            \item \textbf{\textit{Memref}}: memory reference, provides a collection of operations and types focused on representing and manipulating multi-dimensional arrays, or tensors, in memory.
+            \item \textbf{\textit{SCF}}: structured control flow, which includes operations such as loops and conditionals.
+            \item \textbf{\textit{Vector}}: supports multi-dimensional vector types and custom operations on them.
+            \item \textbf{\textit{Affine}}: affine expressions and affine loops that allows polyhedral model compilation, analysis and optimizations.
+          \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\raisebox{-0.25\height}{\includegraphics[height=0.5cm]{img/mlir-identity-09.png}} IR}
+  \begin{itemize}
+    \item IR is \textbf{generic} enough to represent ASTs in a language frontend, generated instructions in a target-specific backend, HLS constructs, circuits (CIRCT), etc.
+    \item IR is based on a graph-like data structure:
+          \begin{itemize}
+            \item Nodes: \textbf{\textit{Operations}}
+            \item Edges: \textbf{\textit{Values}}
+          \end{itemize}
+          Each \textit{Value} is the result of exactly one \textit{Operation} or \textbf{\textit{Block Argument}} and has a \textbf{\textit{Value Type}} defined by the type system.
+    \item Three forms: human-readable (\code{.mlir}), in-memory and serialized.
+  \end{itemize}
+  \begin{figure}[H]
+    \centering
+    \begin{minipage}{0.475\textwidth}
+      \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{6}{6}]{text}{fig/mlir_ir_example.mlir}
+    \end{minipage}
+  \end{figure}
+\end{frame}
+
+\section{CIRCT}
+
+\begin{frame}{\raisebox{-0.25\height}{\includegraphics[height=0.5cm]{img/circt-logo.png}} CIRCT}
+  \begin{itemize}
+    \item TODO
+  \end{itemize}
 \end{frame}
 
 \end{document}
