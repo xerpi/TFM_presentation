@@ -14,6 +14,7 @@
 \usepackage{xspace}
 \usepackage{pgfplots}
 \usepackage{tikz}
+\usepackage[export]{adjustbox}
 
 \usetheme[progressbar=frametitle]{metropolis}
 \setbeamerfont{block title}{size=\small}
@@ -297,6 +298,7 @@
 \begin{frame}{\raisebox{-0.25\height}{\includegraphics[height=0.5cm]{img/mlir-identity-09.png}}}
   \begin{itemize}
     \item Multi-Level Intermediate Representation (MLIR): open-source compiler infrastructure project; provides common IR to represent \textbf{multiple levels of abstractions} maintaining a \textbf{unified interface}.
+    \item Under LLVM's umbrella.
     \item Address challenges in building compilers and optimizing code generation for modern high-performance computing and machine-learning applications.
           \begin{itemize}
             \item Many compilation and system design problems are better modeled at a \textbf{higher-} or \textbf{lower-level abstraction}. Languages that use LLVM end up developing their IR to solve domain-specific problems. ML frameworks also use domain-specific abstractions (\textquote{ML graphs}).
@@ -353,9 +355,40 @@
 
 \begin{frame}{\raisebox{-0.25\height}{\includegraphics[height=0.5cm]{img/circt-logo.png}} CIRCT}
   \begin{itemize}
-    \item \textbf{C}ircuit \textbf{IR} \textbf{C}ompilers and \textbf{T}ools (CIRCT): project built on top of MLIR that aims to take advantage of the infrastructure and methodology of MLIR to provide a set of tools and libraries to help with the design and verification of digital circuits.
-    \item TODO
+    \item \textbf{C}ircuit \textbf{IR} \textbf{C}ompilers and \textbf{T}ools (CIRCT): project built \textbf{on top of MLIR}. Provides a set of tools and libraries to help with the \textbf{design} and verification of \textbf{digital circuits}.
+    \item Adds new \textbf{hardware-oriented dialects} such as:
+          \begin{itemize}
+            \item \textit{\textbf{\code{hw}}}: generic HW dialect where other dialect operations are instantiated.
+            \item \textit{\textbf{\code{comb}}}: models digital combinational logic.
+            \item \textit{\textbf{\code{seq}}}: models digital sequential logic.
+            \item \textit{\textbf{\code{fsm}}}: models finite-state machines.
+            \item \textit{\textbf{\code{sv}}}: represents various SystemVerilog-specific constructs.
+            \item \textit{\textbf{\code{calyx}}}: represents Calyx IR types and operations.
+          \end{itemize}
+    \item Provides a static scheduling infrastructure:
+          \begin{itemize}
+            \item A \texit{problem} is created from the IR (such as \textit{ModuloProblem}).
+            \item A \textit{scheduler} solves the problem (list scheduler, LP-based schedulers, etc).
+            \item \code{AffineToLoopSchedule} pass uses Calyx operator library for operation latencies and lowers to \code{LoopSchedule} dialect.
+          \end{itemize}
+    \item \codecpp{circt::createExportVerilogPass()} takes IR and emits SystemVerilog code.
+          \begin{itemize}
+            \item Style and options controlled by \codecpp{struct circt::LoweringOptions}.
+          \end{itemize}
+    \item Under LLVM's umbrella.
+    \item SiFive contributing to CIRCT (order of magnitude faster than the current Chisel compiler).
   \end{itemize}
+\end{frame}
+
+\begin{frame}{\raisebox{-0.25\height}{\includegraphics[height=0.5cm]{img/circt-logo.png}} CIRCT Dialects and conversion passes}
+  \begin{figure}[H]
+    \includegraphics[width=4.1cm,left]{img/circt-dialectlegend.png}
+  \end{figure}
+  \begin{figure}[H]
+    \centering
+    \vspace*{-1.1cm}
+    \includegraphics[height=8.1cm]{img/circt-dialects.png}
+  \end{figure}
 \end{frame}
 
 \section{Calyx}
