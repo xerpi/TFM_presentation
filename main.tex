@@ -367,7 +367,7 @@
           \end{itemize}
     \item Provides a static scheduling infrastructure:
           \begin{itemize}
-            \item A \texit{problem} is created from the IR (such as \textit{ModuloProblem}).
+            \item A \textit{problem} is created from the IR (such as \textit{ModuloProblem}).
             \item A \textit{scheduler} solves the problem (list scheduler, LP-based schedulers, etc).
             \item \code{AffineToLoopSchedule} pass uses Calyx operator library for operation latencies and lowers to \code{LoopSchedule} dialect.
           \end{itemize}
@@ -393,9 +393,24 @@
 
 \section{Calyx}
 
-\begin{frame}{\raisebox{-0.25\height}{\includegraphics[height=0.5cm]{img/calyx-logo-text.png}}}
+\begin{frame}[fragile]{\raisebox{-0.25\height}{\includegraphics[height=0.5cm]{img/calyx-logo-text.png}}}
   \begin{itemize}
-    \item TODO
+    \item Many hardware DSLs \textbf{re-engineer} a new \textbf{intermediate language} (IL) and compiler to generate the HW.
+    \item \textbf{\textit{Calyx}} is a \textbf{shared IL} along a compiler infrastructure that implements useful optimizations and analyses, so that new hardware DSLs can use it as an \textbf{intermediate step} to quickly generate hardware designs.
+    \item In Calyx, \textbf{\textit{components}} correspond to hardware modules (with input and output ports). Each \textit{component} has three distinct sections:
+          \begin{itemize}
+            \item \textbf{\code{cells}}: the instantion of hardware sub-components that form the \textit{component} being defined.
+            \item \textbf{\code{wires}}: set of connection between the sub-components. They can be organized into \textbf{\code{groups}}.
+            \item \textbf{\code{control}}: imperative control flow that defines the \textit{component}'s execution schedule (when each \code{group} executes).
+          \end{itemize}
+          \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.32\textwidth}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{6}{6}]{text}{fig/calyx_component.calyx}
+            \end{minipage}
+          \end{figure}
+    \item Each \code{group} has \code{go} and \code{done} ports. \code{go} triggers execution of the \code{done} notifies when it finishes. The \code{control} section uses those signals to orchestrate \code{group} execution.
+    \item \code{Control} statements: \code{seq}, \code{par}, \code{if} and \code{while}.
   \end{itemize}
 \end{frame}
 
