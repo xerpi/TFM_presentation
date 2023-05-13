@@ -409,8 +409,15 @@
               \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{6}{6}]{text}{fig/calyx_component.calyx}
             \end{minipage}
           \end{figure}
-    \item Each \code{group} has \code{go} and \code{done} ports. \code{go} triggers execution of the \code{done} notifies when it finishes. The \code{control} section uses those signals to orchestrate \code{group} execution.
+    \item Each \code{group} has \textbf{\code{go}} and \textbf{\code{done}} ports. \code{go} triggers execution of the group, \code{done} finishes it. The \code{control} section uses those signals to orchestrate \code{group} execution.
     \item \code{Control} statements: \code{seq}, \code{par}, \code{if} and \code{while}.
+    \item An \textit{assignment} can optionally have a \code{guard} expression:
+          \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.275\textwidth}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{6}{6}]{text}{fig/guarded_example.calyx}
+            \end{minipage}
+          \end{figure}
   \end{itemize}
 \end{frame}
 
