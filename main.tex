@@ -421,4 +421,22 @@
   \end{itemize}
 \end{frame}
 
+\section{Methodology}
+
+\begin{frame}{Methodology}
+  \begin{itemize}
+    \item Halide down to RTL (Xilinx FPGAs bitstream + XRT) is complex and involves \textbf{many steps}.
+    \item \textbf{Top-down} and \textbf{incremental and iterative} design methodology. Start from simple Halide pipeline and keep adding complexity (new Halide IR nodes), then adding MLIR conversion for them.
+          \begin{itemize}
+            \item Start with \codecpp{output(x) = x + 42;}, Halide IR nodes: \codecpp{Add}, \codecpp{IntImm}, \codecpp{For} and \codecpp{Store}.
+          \end{itemize}
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \scalebox{.36}{\input{fig/mlir_to_xilinx.tex}}
+  \end{figure}
+\end{frame}
+
+\section{Implementation of the Halide MLIR \textit{CodeGen}}
+
 \end{document}
