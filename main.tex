@@ -265,6 +265,10 @@
             \item \codecpp{Store} and \code{Load} to perform memory accesses
           \end{itemize}
     \item \codecpp{struct IRNode}: \codecpp{IRNodeType} + reference count. Virtual method \codecpp{accept} to implement the \textbf{visitor pattern}.
+          \begin{itemize}
+            \item \codecpp{IRVisitor}: traverse the IR nodes and perform some action on it (like generating code), but without modifying them.
+            \item \codecpp{IRMutator}: traverse the IR nodes to modify them.
+          \end{itemize}
     \item Two kinds of nodes, analogously to C:
           \begin{itemize}
             \item \textbf{Expressions} (\codecpp{ExprNode}): represent some value and have some type (e.g. \codecpp{x + 3})
@@ -406,7 +410,7 @@
           \begin{figure}[H]
             \centering
             \begin{minipage}{0.32\textwidth}
-              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{6}{6}]{text}{fig/calyx_component.calyx}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{5}{5}]{text}{fig/calyx_component.calyx}
             \end{minipage}
           \end{figure}
     \item Each \code{group} has \textbf{\code{go}} and \textbf{\code{done}} ports. \code{go} triggers execution of the group, \code{done} finishes it. The \code{control} section uses those signals to orchestrate \code{group} execution.
@@ -415,7 +419,7 @@
           \begin{figure}[H]
             \centering
             \begin{minipage}{0.275\textwidth}
-              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{6}{6}]{text}{fig/guarded_example.calyx}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{5}{5}]{text}{fig/guarded_example.calyx}
             \end{minipage}
           \end{figure}
   \end{itemize}
@@ -426,7 +430,7 @@
 \begin{frame}{Methodology}
   \begin{itemize}
     \item Halide down to RTL (Xilinx FPGAs bitstream + XRT) is complex and involves \textbf{many steps}.
-    \item \textbf{Top-down} and \textbf{incremental and iterative} design methodology. Start from simple Halide pipeline and keep adding complexity (new Halide IR nodes), then adding MLIR conversion for them.
+    \item \textbf{Top-down} and \textbf{incremental and iterative} design methodology. Start from simple Halide pipeline and keep adding complexity (new Halide IR nodes), then add MLIR conversion for them.
           \begin{itemize}
             \item Start with \codecpp{output(x) = x + 42;}, Halide IR nodes: \codecpp{Add}, \codecpp{IntImm}, \codecpp{For} and \codecpp{Store}.
           \end{itemize}
@@ -438,5 +442,39 @@
 \end{frame}
 
 \section{Implementation of the Halide MLIR \textit{CodeGen}}
+
+\begin{frame}{Marking loops to be offloaded to an accelerator}
+  \begin{enumerate}
+    \item \codecpp{InjectAcceleratorOffload} \codecpp{IRMutator} traverses IR and marks \code{For} IR nodes with new \codecpp{enum DeviceAPI::XRT}.
+    \item For each marked \code{For}:
+          \begin{enumerate}
+            \item Pass the loop \codecpp{Stmt} and kernel name to virtual class called \codecpp{CodeGen_Accelerator_Dev}
+                  \begin{itemize}
+                    \item \codecpp{CodeGen_Xilinx_Dev} for \codecpp{enum DeviceAPI::XRT}
+                  \end{itemize}
+            \item Replace the loop with a call to the Halide runtime that has been implemented for XRT (\code{xrt.cpp}):
+                  \begin{itemize}
+                    \item \codecpp{halide_xrt_run} to start kernel execution
+                    \item But also \codecpp{halide_xrt_initialize_kernels} and \codecpp{halide_xrt_finalize_kernels} before/after the kernel execution to load/unload the kernel (FPGA bitstream).
+                  \end{itemize}
+          \end{enumerate}
+    \item \codecpp{CodeGen_Xilinx_Dev} uses \codecpp{CodeGen_MLIR} internally to generate the high-level MLIR code to be transformed into RTL.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{\code{CodeGen_MLIR}: Halide IR to MLIR translation}
+  \begin{itemize}
+    \item Kernel arguments converted into \code{func}'s \codecpp{FuncOp}:
+          \begin{enumerate}
+            \item Non-buffer arguments: \codecpp{mlir_type_of} converts Halide type to MLIR type.
+            \item Buffer arguments: two MLIR arguments are generated:
+                  \begin{enumerate}
+                    \item 64-bit integer argument: base offset of the buffer within the assigned AXI interface. Written by the host code prior to kernel execution.
+                    \item \codecpp{MemRefType} argument, \code{Memref} dialect, needed by MLIR to perform load/store accesses. Gets converted into a \textit{Calyx external memory interface} later on.
+                  \end{enumerate}
+          \end{enumerate}
+    \item TODO
+  \end{itemize}
+\end{frame}
 
 \end{document}
