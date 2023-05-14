@@ -442,7 +442,7 @@
   \end{figure}
 \end{frame}
 
-\section{Implementation of the Halide MLIR \textit{CodeGen}}
+\section{Halide MLIR \textit{CodeGen}}
 
 \begin{frame}{Marking loops to be offloaded to an accelerator}
   \begin{enumerate}
@@ -618,7 +618,7 @@
             \item Interrupt registers to enable/mask interrupts.
             \item At offset \codecpp{+0x10} kernel arguments.
           \end{itemize}
-    \item Interrupt signal events kernel $\rightarrow$ host to avoid continuous polling.
+    \item Interrupt line signals events kernel $\rightarrow$ host to avoid continuous polling.
   \end{itemize}
   \begin{figure}[H]
     \begin{minipage}[H]{\textwidth}
@@ -636,5 +636,36 @@
     \end{minipage}
   \end{figure}
 \end{frame}
+
+\section{Halide runtime XRT backend}
+
+\begin{frame}{Halide runtime XRT backend (\code{xrt.cpp})}
+  \begin{itemize}
+    \item Implements \codecpp{struct halide_device_interface_impl_t} interface:
+          \begin{itemize}
+            \item \codecpp{halide_xrt_device_malloc}: allocate buffers that the device can access.
+            \item \codecpp{halide_xrt_device_free}: deallocate them.
+            \item \codecpp{halide_xrt_copy_to_device}: copy a buffer to device/flush CPU cache so that all changes are visible to the device.
+            \item \code{halide_xrt_copy_to_host}: copy buffer to host/flush all the relevant device buffers and invalidate CPU cache so that all changes are visible to the host.
+          \end{itemize}
+    \item Also implements functions called directly when \code{For} loop is offloaded to the accelerator:
+          \begin{itemize}
+            \item \codecpp{halide_xrt_initialize_kernels}: loads a kernel into the device.
+            \item \codecpp{halide_xrt_finalize_kernels}: unload the kernel.
+            \item \codecpp{halide_xrt_run}: starts kernel execution with the specified arguments.
+          \end{itemize}
+    \item Allocating buffers depends on loading kernel first, so they are \textbf{lazily allocated}: just prior to kernel execution.
+    \item Uses XRT's C API. Seamless integration with Halide.
+  \end{itemize}
+\end{frame}
+
+\section{Evaluation}
+
+\begin{frame}{Evaluation}
+
+\end{frame}
+
+\section{Conclusions and future work}
+
 
 \end{document}
