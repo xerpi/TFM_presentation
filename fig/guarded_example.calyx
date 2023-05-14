@@ -1,0 +1,6 @@
+group mygroup {
+	reg3.in = cmp.out ? reg1.out;
+	reg3.in = !cmp.out ? reg2.out;
+	reg3.write_en = 1'b1;
+	mygroup[done] = reg3.done;
+}

@@ -1,0 +1,59 @@
+\begin{tikzpicture}[outerstyle/.style = {rectangle, draw, align=center}, innerstyle/.style = {rectangle, draw, align=center, fill=olive!30}, labelstyle/.style={draw=none, below right, inner sep=4pt}]
+  \tikzstyle{every node}=[font=\large]
+  % Halide
+  \node[innerstyle, minimum width=4cm, style={fill=cyan!30}] (halide) {Halide IR};
+
+  % CodeGen_MLIR
+  \node[below=of halide] (empty0) {};
+  \node[innerstyle, below=4mm of empty0] (mlir) {MLIR};
+  \node[outerstyle, fit={(empty0) (mlir)}, below=of halide, minimum width=115mm] (CodeGen_MLIR) {};
+  \node[labelstyle] at (CodeGen_MLIR.north west) {\code{CodeGen_MLIR}};
+
+  % CodeGen_CIRCT
+  \node[below=of mlir] (empty1) {};
+  \node[innerstyle, below=4mm of empty1] (circt_calyx) {CIRCT (Calyx dialect)};
+  \node[innerstyle, below=4mm of circt_calyx] (circt_hw) {CIRCT (HW dialects)};
+  \node[outerstyle, fit={(empty1) (circt_calyx) (circt_hw)}, below=of mlir, minimum width=115mm] (CodeGen_CIRCT) {};
+  \node[labelstyle] at (CodeGen_CIRCT.north west) {\code{CodeGen_CIRCT}};
+
+  % CodeGen_CIRCT_Xilinx_Dev
+  \node[below=of circt_hw] (empty2) {};
+  \node[innerstyle, below=4mm of empty2] (circt_xilinx) {CIRCT (HW dialects)\\+\\Xilinx-specific RTL kernel wrappers};
+  \node[outerstyle, fit={(empty2) (circt_xilinx)}, below=of circt_hw, minimum width=115mm] (CodeGen_CIRCT_Xilinx_Dev) {};
+  \node[labelstyle] at (CodeGen_CIRCT_Xilinx_Dev.north west) {\code{CodeGen_CIRCT_Xilinx_Dev}};
+
+  % ExportVerilog
+  \node[below=of circt_xilinx] (empty3) {};
+  \node[innerstyle, below=4mm of empty3] (sv_files) {SystemVerilog files};
+  \node[outerstyle, fit={(empty3) (sv_files)}, below=of circt_xilinx, minimum width=115mm] (ExportVerilog) {};
+  \node[labelstyle] at (ExportVerilog.north west) {\code{ExportVerilog}};
+
+  % package_xo
+  \node[below=of sv_files] (empty4) {};
+  \node[innerstyle, below=4mm of empty4] (xo) {Xilinx object file (\code{.xo})};
+  \node[outerstyle, fit={(empty4) (xo)}, below=of sv_files, minimum width=115mm] (package_xo) {};
+  \node[labelstyle] at (package_xo.north west) {Xilinx Vivado \code{package_xo}};
+
+  % v++
+  \node[below=of xo] (empty5) {};
+  \node[innerstyle, below=4mm of empty5] (xclbin) {Xilinx binary file (\code{.xclbin})};
+  \node[outerstyle, fit={(empty5) (xclbin)}, below=of xo, minimum width=115mm] (v++) {};
+  \node[labelstyle] at (v++.north west) {Xilinx Vitis \code{v++}};
+
+  % XRT
+  \node[below=of xclbin] (empty6) {};
+  \node[innerstyle, below=4mm of empty6] (run) {Execute on the FPGA};
+  \node[outerstyle, fit={(empty6) (run)}, below=of xclbin, minimum width=115mm] (XRT) {};
+  \node[labelstyle] at (XRT.north west) {Halide XRT runtime (\code{xrt.cpp})};
+
+  % arrows
+  \draw [->] (halide.south) to (mlir);
+  \draw [->] (mlir.south) to (circt_calyx);
+  \draw [->] (circt_calyx.south) to (circt_hw);
+  \draw [->] (circt_hw.south) to (circt_xilinx);
+  \draw [->] (circt_xilinx.south) to (sv_files);
+  \draw [->] (sv_files.south) to (xo);
+  \draw [->] (xo.south) to (xclbin);
+  \draw [->] (xclbin.south) to (run);
+
+\end{tikzpicture}
