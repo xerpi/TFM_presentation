@@ -1,0 +1,51 @@
+\begin{tikzpicture}[outerstyle/.style = {rectangle, draw, align=center}, innerstyle/.style = {rectangle, draw, align=center, fill=olive!30}, labelstyle/.style={draw=none, below right, inner sep=4pt}]
+
+% Generic MLIR
+\node[innerstyle, minimum width=4cm, style={fill=cyan!30}] (MLIR) {Generic MLIR};
+
+% CodeGen_CIRCT
+\node[below=6mm of MLIR] (empty1) {};
+\node[below=of empty1] (empty2) {};
+
+\node[innerstyle, below=4mm of empty2] (for_to_while) {\codecpp{mlir::createForToWhileLoopPass()}};
+\node[innerstyle, below=4mm of for_to_while] (scf_to_calyx) {\codecpp{circt::createSCFToCalyxPass()}};
+
+\node[below=of scf_to_calyx] (empty3) {};
+
+\node[innerstyle, below=4mm of empty3] (remove_comb_groups) {\codecpp{circt::calyx::createRemoveCombGroupsPass()}};
+\node[innerstyle, below=4mm of remove_comb_groups] (calyx_to_fsm) {\codecpp{circt::createCalyxToFSMPass()}};
+\node[innerstyle, below=4mm of calyx_to_fsm] (materialize_calyx_fsm) {\codecpp{circt::createMaterializeCalyxToFSMPass()}};
+\node[innerstyle, below=4mm of materialize_calyx_fsm] (remove_groups_from_fsm) {\codecpp{circt::createRemoveGroupsFromFSMPass()}};
+\node[innerstyle, below=4mm of remove_groups_from_fsm] (clk_ins) {\codecpp{circt::calyx::createClkInsertionPass()}};
+\node[innerstyle, below=4mm of clk_ins] (reset_ins) {\codecpp{circt::calyx::createResetInsertionPass()}};
+\node[innerstyle, below=4mm of reset_ins] (calyx_to_hw) {\codecpp{circt::createCalyxToHWPass()}};
+
+\node[below=4mm of calyx_to_hw] (empty4) {};
+\node[below=4mm of empty4] (empty5) {};
+
+\node[outerstyle, fit={(empty2) (for_to_while) (scf_to_calyx)}, below=of empty1, minimum width=105mm] (MLIR_to_Calyx) {};
+
+\node[outerstyle, fit={(empty3) (remove_comb_groups) (calyx_to_fsm) (materialize_calyx_fsm) (remove_groups_from_fsm) (clk_ins) (reset_ins) (calyx_to_hw)}, below=of scf_to_calyx, minimum width=105mm] (Calyx_to_HW) {};
+
+\node[outerstyle, fit={(MLIR_to_Calyx) (Calyx_to_HW) (empty5)}, below=of MLIR, minimum width=115mm] (CodeGen_CIRCT) {};
+
+\node[labelstyle] at (MLIR_to_Calyx.north west) {MLIR to Calyx};
+\node[labelstyle] at (Calyx_to_HW.north west) {Calyx to hardware};
+\node[labelstyle] at (CodeGen_CIRCT.north west) {\code{CodeGen_CIRCT}};
+
+% XRT
+\node[innerstyle, below=10mm of empty4, style={fill=cyan!30}] (circt_hw_dialects) {CIRCT with hardware dialects};
+
+% arrows
+\draw [->] (MLIR.south) to (for_to_while);
+\draw [->] (for_to_while.south) to (scf_to_calyx);
+\draw [->] (scf_to_calyx.south) to (remove_comb_groups);
+\draw [->] (remove_comb_groups.south) to (calyx_to_fsm);
+\draw [->] (calyx_to_fsm.south) to (materialize_calyx_fsm);
+\draw [->] (materialize_calyx_fsm.south) to (remove_groups_from_fsm);
+\draw [->] (remove_groups_from_fsm.south) to (clk_ins);
+\draw [->] (clk_ins.south) to (reset_ins);
+\draw [->] (reset_ins.south) to (calyx_to_hw);
+\draw [->] (calyx_to_hw.south) to (circt_hw_dialects);
+
+\end{tikzpicture}

@@ -462,19 +462,113 @@
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{\code{CodeGen_MLIR}: Halide IR to MLIR translation}
+\begin{frame}{\code{CodeGen_MLIR}: Halide IR to MLIR conversion: Basics}
   \begin{itemize}
     \item Kernel arguments converted into \code{func}'s \codecpp{FuncOp}:
-          \begin{enumerate}
+          \begin{itemize}
             \item Non-buffer arguments: \codecpp{mlir_type_of} converts Halide type to MLIR type.
             \item Buffer arguments: two MLIR arguments are generated:
                   \begin{enumerate}
-                    \item 64-bit integer argument: base offset of the buffer within the assigned AXI interface. Written by the host code prior to kernel execution.
-                    \item \codecpp{MemRefType} argument, \code{Memref} dialect, needed by MLIR to perform load/store accesses. Gets converted into a \textit{Calyx external memory interface} later on.
+                    \item 64-bit integer: base offset of the buffer within the assigned AXI interface. Written by the host code prior to kernel execution.
+                    \item \codecpp{MemRefType} (\code{Memref} dialect): needed by MLIR to perform load/store accesses. Gets converted into a \textit{Calyx external memory interface} later on. Before accessing the base offset is added. Symbol name has \codecpp{".buffer"} suffix.
                   \end{enumerate}
-          \end{enumerate}
-    \item TODO
+          \end{itemize}
+    \item Subclass of \codecpp{IRVisitor}, \codecpp{CodeGen_MLIR::Visitor}, walks IR tree and emits MLIR.
+          \begin{itemize}
+            \item Has a \codecpp{void visit(const <NodeType> *)} for each Halide IR node type
+          \end{itemize}
+    \item \textquote{Scoped} symbol table maps string $\rightarrow$ \codecpp{mlir::Value}.
+          \begin{itemize}
+            \item \codecpp{sym_push}, \codecpp{sym_pop}, \codecpp{sym_get}
+          \end{itemize}
+    \item Helper methods \codecpp{codegen} for \codecpp{Expr} and \codecpp{Stmt}:
+          \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.3\textwidth}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{6}{6}]{cpp}{fig/codegen_methods.cpp}
+            \end{minipage}
+          \end{figure}
+          They call \codecpp{accept} method of the \codecpp{Expr}/\codecpp{Stmt} passing \codecpp{this} as the \codecpp{IRVisitor*} argument, which calls the corresponding \codecpp{visit} method of the \codecpp{CodeGen_MLIR::Visitor} class for that \codecpp{Expr} or \codecpp{Stmt} node type.\\
+          E.g. \codecpp{codegen(myIntImm)} calls \codecpp{IRVisitor::visit(const IntImm *)}.
   \end{itemize}
 \end{frame}
+
+\begin{frame}{\code{CodeGen_MLIR}: Halide IR to MLIR conversion: Basic nodes}
+  \begin{itemize}
+    \item \codecpp{Let}, \codecpp{LetStmt}: represent the \textquote{let} construct found in many functional programming languages.
+          \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.355\textwidth}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{5}{5}]{cpp}{fig/let_conversion.cpp}
+            \end{minipage}
+          \end{figure}
+    \item \codecpp{IntImm}, \codecpp{UIntImm}, \codecpp{FloatImm}: numeric immediates. \codecpp{mlir_type_of} to convert it to the corresponding \codecpp{mlir::Type}.
+          \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.46\textwidth}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{5}{5}]{cpp}{fig/immediate_conversion.cpp}
+            \end{minipage}
+          \end{figure}
+    \item \codecpp{Add}, \codecpp{Sub}: addition/subtraction of two \codecpp{Expr}.
+          \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.55\textwidth}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{5}{5}]{cpp}{fig/add_conversion.cpp}
+            \end{minipage}
+          \end{figure}
+    \item \codecpp{EQ}, \codecpp{NE}: equality and inequality comparison operations.
+          \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.55\textwidth}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{5}{5}]{cpp}{fig/eq_conversion.cpp}
+            \end{minipage}
+          \end{figure}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\code{CodeGen_MLIR}: Halide IR to MLIR conversion: \code{For} loop}
+  \begin{itemize}
+    \item \codecpp{For}: the only loop construct that Halide IR has.
+          \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.65\textwidth}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{5}{5}]{cpp}{fig/for_conversion.cpp}
+            \end{minipage}
+          \end{figure}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\code{CodeGen_MLIR}: Halide IR to MLIR conversion: \code{Load}/\code{Store}}
+  \begin{itemize}
+    \item \codecpp{Load}, \codecpp{Store}: memory accesses.
+          \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.75\textwidth}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{5}{5}]{cpp}{fig/load_conversion.cpp}
+            \end{minipage}
+          \end{figure}
+  \end{itemize}
+\end{frame}
+
+\section{Lowering MLIR to CIRCT}
+
+\begin{frame}{\code{CodeGen_CIRCT}: Generates generic RTL kernel}
+  \begin{itemize}
+    \item \codecpp{MemRefType} arguments transformed into \textit{Calyx external memory interface}
+    \item New features implemented:
+          \begin{itemize}
+            \item Passing custom argument names to Calyx
+            \item Support for sequential-reads memories (\code{read_en})and variable memory-access sizes (\code{access_size})
+            \item Support more \code{arith} dialect operations such as \codecpp{MinSIOp}
+            \item Adding initial vector support (\code{calyx::AssignOp} modified to assign flattened bits $\leftrightarrow$ vectors)
+            \item Implement basic \code{vector} dialect operations (such as \codecpp{vector::SplatOp}, a scalar $\rightarrow$ vector broadcast)
+          \end{itemize}
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \scalebox{.4}{\input{fig/mlir_to_circt.tex}}
+  \end{figure}
+\end{frame}
+
 
 \end{document}
