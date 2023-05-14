@@ -1,0 +1,16 @@
+\begin{tikzpicture}[shorten >=1pt, auto, node distance=4.2cm, scale=0.75, transform shape, state/.style={circle split, draw, minimum size=2.3cm}]
+\node[state, initial, style={circle}] (IDLE) {IDLE};
+\node[state] (AW)     [right of=IDLE] {AW      \nodepart{lower} \code{awvalid=1}};
+\node[state] (W)      [right of=AW]   {W       \nodepart{lower} \code{wvalid=1}};
+\node[state] (B_WAIT) [right of=W]    {B\_WAIT \nodepart{lower} \code{bready=1}};
+\node[state] (AR)     [below of=IDLE, node distance=5cm] {AR      \nodepart{lower} \code{arvalid=1}};
+\node[state] (R)      [below of=W]    {R       \nodepart{lower} \code{rready=1}};
+\path[-{Stealth[black]}]
+(IDLE) edge [text=red, bend left]        node {\code{calyx_write_en}} (AW)
+(IDLE) edge [text=red, bend right, left] node {\code{calyx_read_en}} (AR)
+(AW) edge [text=blue, bend left]         node {\code{m_axi_awready}} (W)
+(W) edge [text=blue, bend left]          node {\code{m_axi_wready}} (B_WAIT)
+(B_WAIT) edge [bend left]     node {\textcolor{blue}{\code{m_axi_bvalid}} / \textcolor{red}{\code{calyx_done}}} (IDLE)
+(AR) edge [text=blue, bend right, below] node {\code{m_axi_arready}} (R)
+(R) edge [bend right=-18]     node {\makecell[c]{\textcolor{blue}{\code{m_axi_rvalid}} \\ / \\ \textcolor{red}{\code{calyx_done}}}} (IDLE);
+\end{tikzpicture}

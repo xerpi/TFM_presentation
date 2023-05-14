@@ -1,0 +1,7 @@
+\begin{tikzpicture}[shorten >=1pt, auto, node distance=5cm, scale=0.75, transform shape, state/.style={circle split, draw, minimum size=2.3cm}]
+\node[state, initial] (IDLE)                 {IDLE \nodepart{lower} \code{arready=1}};
+\node[state]          (DATA) [right of=IDLE] {DATA \nodepart{lower} \code{rvalid=1}};
+\path[-{Stealth[black]}]
+(IDLE) edge [bend left] node {\code{s_axi_control_arvalid}} (DATA)
+(DATA) edge [bend left] node {\code{s_axi_control_rready}}  (IDLE);
+\end{tikzpicture}

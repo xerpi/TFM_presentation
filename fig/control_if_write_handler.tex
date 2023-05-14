@@ -1,0 +1,9 @@
+\begin{tikzpicture}[shorten >=1pt, auto, node distance=5cm, scale=0.75, transform shape, state/.style={circle split, draw, minimum size=2.3cm}]
+\node[state, initial] (IDLE)                 {IDLE \nodepart{lower} \code{awready=1}};
+\node[state]          (DATA) [right of=IDLE] {DATA \nodepart{lower} \code{wready=1}};
+\node[state]          (RESP) [right of=DATA] {RESP \nodepart{lower} \code{bvalid=1}};
+\path[-{Stealth[black]}]
+(IDLE) edge [bend left] node {\code{s_axi_control_awvalid}} (DATA)
+(DATA) edge [bend left] node {\code{s_axi_control_wvalid}}  (RESP)
+(RESP) edge [bend left] node {\code{s_axi_control_bready}}  (IDLE);
+\end{tikzpicture}

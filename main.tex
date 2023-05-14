@@ -7,6 +7,7 @@
 \usepackage{lmodern}
 \usepackage{graphicx}
 \usepackage{csquotes}
+\usepackage{makecell}
 \usepackage{amsmath}
 \usepackage{caption}
 \usepackage{subcaption}
@@ -570,5 +571,70 @@
   \end{figure}
 \end{frame}
 
+\section{Wrapping the generic RTL kernel for Xilinx FPGAs}
+
+\begin{frame}{CIRCT to Xilinx RTL}
+  \begin{itemize}
+    \item Wraps generic RTL kernel with necessary Xilinx-specific logic: \textit{Calyx external memory} to AXI converters and AXI4-Lite subordinate \textbf{control logic} specified by XRT.
+    \item Generates SystemVerilog code and \code{kernel.xml} file needed by Vitis \code{v++}.
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \scalebox{.4}{\input{fig/circt_to_xilinx_rtl.tex}}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\textit{Calyx external memory} to AXI converter}
+  \begin{itemize}
+    \item Buffer kernel arguments are accessed through \textit{Calyx external memory interface}.
+          \begin{itemize}
+            \item Each buffer is mapped into a different interface. This module converts it to AXI.
+          \end{itemize}
+    \item FSM handles two-way handshake of AXI transfers.
+  \end{itemize}
+  \begin{figure}[H]
+    \begin{minipage}[H]{\textwidth}
+      \centering
+      \begin{subfigure}[t]{.45\textwidth}
+        \centering
+        \scalebox{.6}{\input{fig/calyx_ext_mem_to_axi_box.tex}}
+        \caption{\textit{Calyx external memory} to AXI converter}
+      \end{subfigure}
+      \begin{subfigure}[t]{.45\textwidth}
+        \centering
+        \scalebox{.5}{\input{fig/calyx_ext_mem_to_axi_fsm.tex}}
+        \caption{\textit{Calyx external memory} to AXI converter FSM}
+      \end{subfigure}
+    \end{minipage}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Kernel control logic}
+  \begin{itemize}
+    \item Support seamless integration with Xilinx runtime libraries: XRT-managed kernel control requirements.
+    \item Kernel acts as an AXI4-Lite subordinate and exposes a set of registers that are used by the host to control the kernel execution and set up the kernel.
+          \begin{itemize}
+            \item Control register with \code{start} and \code{done} bits.
+            \item Interrupt registers to enable/mask interrupts.
+            \item At offset \codecpp{+0x10} kernel arguments.
+          \end{itemize}
+    \item Interrupt signal events kernel $\rightarrow$ host to avoid continuous polling.
+  \end{itemize}
+  \begin{figure}[H]
+    \begin{minipage}[H]{\textwidth}
+      \centering
+      \begin{subfigure}[t]{.45\textwidth}
+        \centering
+        \scalebox{.5}{\input{fig/control_if_read_handler.tex}}
+        \caption{Control interface read handler FSM.}
+      \end{subfigure}
+      \begin{subfigure}[t]{.45\textwidth}
+        \centering
+        \scalebox{.5}{\input{fig/control_if_write_handler.tex}}
+        \caption{Control interface write handler FSM.}
+      \end{subfigure}
+    \end{minipage}
+  \end{figure}
+\end{frame}
 
 \end{document}

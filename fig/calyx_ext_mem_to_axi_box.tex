@@ -1,0 +1,53 @@
+\begin{tikzpicture}[node distance = 4mm and 4mm, every node/.style={scale=0.75}]
+\node (mod) [draw, minimum width=48mm, minimum height=70mm, align=center] at (0,0) {Calyx external memory\\to AXI converter};
+%
+\coordinate[above left = 22mm and 14mm of mod.west]   (a1);
+\foreach \i [count=\xi from 1] in {2,...,13}
+  \coordinate[below=of a\xi]  (a\i);
+%
+\coordinate[above right = 24mm and 14mm of mod.east]  (b1);
+\foreach \i [count=\xi from 1] in {2,...,13}
+  \coordinate[below=of b\xi]  (b\i);
+%
+\foreach \i [count=\xi from 1] in {
+  \code{m_axi_arready},
+  \code{m_axi_rdata},
+  \code{m_axi_rvalid},
+  \code{m_axi_rlast},
+  \code{m_axi_awready},
+  \code{m_axi_wready},
+  \code{m_axi_bvalid}
+}
+  \draw[->]  (a\xi) node[left, text=blue] {\i} -- (a\xi-| mod.west);
+
+\foreach \i [count=\xi from 8] in {
+  \code{calyx_write_data},
+  \code{calyx_addr0},
+  \code{calyx_write_en},
+  \code{calyx_read_en},
+  \code{calyx_access_size}
+}
+  \draw[->]  (a\xi) node[left, text=red] {\i} -- (a\xi-| mod.west);
+
+\foreach \i [count=\xi from 1] in {
+  \code{m_axi_arvalid},
+  \code{m_axi_arlen},
+  \code{m_axi_rready},
+  \code{m_axi_awaddr},
+  \code{m_axi_awvalid},
+  \code{m_axi_awlen},
+  \code{m_axi_wdata},
+  \code{m_axi_wvalid},
+  \code{m_axi_wstrb},
+  \code{m_axi_wlast},
+  \code{m_axi_bready}
+}
+  \draw[->] (mod.east |- b\xi) -- (b\xi) node[right, text=blue] {\i};
+
+\foreach \i [count=\xi from 12] in {
+  \code{calyx_read_data},
+  \code{calyx_done}
+}
+  \draw[->] (mod.east |- b\xi) -- (b\xi) node[right, text=red] {\i};
+
+\end{tikzpicture}

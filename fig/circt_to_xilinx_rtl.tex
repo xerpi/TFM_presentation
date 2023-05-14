@@ -1,0 +1,55 @@
+\begin{tikzpicture}[outerstyle/.style = {rectangle, draw, align=center}, innerstyle/.style = {rectangle, draw, align=center, minimum height=6mm,  fill=olive!30}, labelstyle/.style={draw=none, below right, inner sep=4pt}]
+
+% Generic MLIR
+\node[innerstyle, minimum width=4cm, style={fill=cyan!30}] (MLIR) {CIRCT with hardware dialects};
+
+% CodeGen_CIRCT_Xilinx_Dev
+\node[below=6mm of MLIR] (empty1) {};
+\node[below=of empty1] (empty2) {};
+
+\node[innerstyle, below=4mm of empty2] (add_calyx_ext_mem_to_axi) {Add Calyx external memory to AXI converters};
+\node[innerstyle, below=4mm of add_calyx_ext_mem_to_axi] (add_control) {Add AXI4-Lite kernel control interface};
+\node[innerstyle, below=4mm of add_control] (add_toplevel) {Add top-level};
+
+\node[below=of add_toplevel] (empty3) {};
+
+\node[innerstyle, below=4mm of empty3] (seq_to_hlmem) {\codecpp{circt::seq::createLowerSeqHLMemPass()}};
+\node[innerstyle, below=4mm of seq_to_hlmem] (fsm_to_sv) {\codecpp{circt::createConvertFSMToSVPass()}};
+\node[innerstyle, below=4mm of fsm_to_sv] (seq_to_sv) {\codecpp{circt::seq::createSeqLowerToSVPass()}};
+\node[innerstyle, below=4mm of seq_to_sv] (export_sv) {\codecpp{circt::exportSplitVerilog(directory)}};
+
+\coordinate (export_sv_midsw) at ($(export_sv.south west)!.5!(export_sv.south)$);
+
+\node[below=4mm of export_sv_midsw] (empty4) {};
+\node[innerstyle, below=9mm of export_sv, anchor=west] (gen_kernelxml) {Generate \code{kernel.xml}};
+\node[below=7mm of gen_kernelxml] (empty5) {};
+\node[below=4mm of empty5] (empty6) {};
+
+\node[outerstyle, fit={(empty2) (add_calyx_ext_mem_to_axi) (add_control) (add_toplevel)}, below=of empty1, minimum width=105mm] (add_xilinx_wrappers) {};
+
+\node[outerstyle, fit={(empty3) (seq_to_hlmem) (fsm_to_sv) (seq_to_sv) (export_sv)}, below=of add_toplevel, minimum width=105mm] (Generate_SV) {};
+
+\node[outerstyle, fit={(add_xilinx_wrappers) (Generate_SV) (gen_kernelxml) (empty5)}, below=of MLIR, minimum width=115mm] (CodeGen_CIRCT_Xilinx_Dev) {};
+
+\node[labelstyle] at (add_xilinx_wrappers.north west) {Add Xilinx wrappers};
+\node[labelstyle] at (Generate_SV.north west) {Generate SystemVerilog};
+\node[labelstyle] at (CodeGen_CIRCT_Xilinx_Dev.north west) {\code{CodeGen_CIRCT_Xilinx_Dev}};
+
+% SV
+\node[innerstyle, below=18mm of empty4, style={fill=cyan!30}] (sv_code) {SystemVerilog code};
+
+% kernel.xml
+\node[innerstyle, below=12.6mm of gen_kernelxml, style={fill=cyan!30}] (kernel_xml) {\code{kernel.xml}};
+
+% arrows
+\draw [->] (MLIR.south) to (add_calyx_ext_mem_to_axi);
+\draw [->] (add_calyx_ext_mem_to_axi.south) to (add_control);
+\draw [->] (add_control.south) to (add_toplevel);
+\draw [->] (add_toplevel.south) to (seq_to_hlmem);
+\draw [->] (seq_to_hlmem.south) to (fsm_to_sv);
+\draw [->] (fsm_to_sv.south) to (seq_to_sv);
+\draw [->] (seq_to_sv.south) to (export_sv);
+\draw [->] (export_sv_midsw) to (sv_code);
+\draw [->] (gen_kernelxml.south) to (kernel_xml);
+
+\end{tikzpicture}
