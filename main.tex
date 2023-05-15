@@ -438,7 +438,7 @@
 
 \begin{frame}{Methodology}
   \begin{itemize}
-    \item Halide down to RTL (Xilinx FPGAs bitstream + XRT) is complex and involves \textbf{many steps}.
+    \item Converting Halide down to RTL (Xilinx FPGAs bitstream + XRT) is complex and involves \textbf{many steps}.
     \item \textbf{Top-down} and \textbf{incremental and iterative} design methodology. Start from simple Halide pipeline and keep adding complexity (new Halide IR nodes), then add MLIR conversion for them.
           \begin{itemize}
             \item Start with \codecpp{output(x) = x + 42;}, Halide IR nodes: \codecpp{Add}, \codecpp{IntImm}, \codecpp{For} and \codecpp{Store}.
@@ -484,7 +484,7 @@
           \end{itemize}
     \item Subclass of \codecpp{IRVisitor}, \codecpp{CodeGen_MLIR::Visitor}, walks IR tree and emits MLIR.
           \begin{itemize}
-            \item Has a \codecpp{void visit(const <NodeType> *)} for each Halide IR node type
+            \item Has a \codecpp{void visit(const <NodeType> *)} method for each Halide IR node type
           \end{itemize}
     \item \textquote{Scoped} symbol table maps string $\rightarrow$ \codecpp{mlir::Value}.
           \begin{itemize}
@@ -567,7 +567,7 @@
     \item New features implemented:
           \begin{itemize}
             \item Passing custom argument names to Calyx
-            \item Support for sequential-reads memories (\code{read_en})and variable memory-access sizes (\code{access_size})
+            \item Support for sequential-reads memories (\code{read_en}) and variable memory-access sizes (\code{access_size})
             \item Support more \code{arith} dialect operations such as \codecpp{MinSIOp}
             \item Adding initial vector support (\code{calyx::AssignOp} modified to assign flattened bits $\leftrightarrow$ vectors)
             \item Implement basic \code{vector} dialect operations (such as \codecpp{vector::SplatOp}, a scalar $\rightarrow$ vector broadcast)
@@ -852,8 +852,7 @@
           \begin{itemize}
             \item Still \textbf{work to do} and features to be added to improve the generated code.
           \end{itemize}
-    \item Contributed to open source projects by finding bugs, fixing them, adding
-    and bringing the necessity of new features.
+    \item Contributed to open source projects by finding bugs, fixing them, and adding and bringing the necessity of new features.
   \end{itemize}
 \end{frame}
 
