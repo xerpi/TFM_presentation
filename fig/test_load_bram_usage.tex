@@ -1,0 +1,15 @@
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-12}
+\multicolumn{1}{c|}{} & \multicolumn{11}{c|}{\textbf{Vectorization factor}} \\
+\cline{2-12}
+\multicolumn{1}{c|}{} & \multicolumn{2}{c|}{\textbf{None (1)}} & \multicolumn{2}{c|}{\textbf{2}} & \multicolumn{2}{c|}{\textbf{4}} & \multicolumn{2}{c|}{\textbf{8}} & \multicolumn{2}{c|}{\textbf{16}} & \multicolumn{1}{c|}{\textbf{32}} \\
+\hline
+\multicolumn{1}{|c|}{\textbf{AXI data bus size (bits)}} & 32 & 1024 & 64 & 1024 & 128 & 1024 & 256 & 1024 & 512 & 1024 & 1024 \\
+\hline
+\multicolumn{1}{|l|}{Block RAM Tile}           &  8.56 & 46.76 &  8.56 & 46.76 &  9.49 & 46.76 & 15.05 & 46.76 & 25.46 & 46.76 & 46.76 \\
+\grayline
+\multicolumn{1}{|l|}{\hspace{28pt}RAMB36/FIFO} &  7.41 & 45.37 &  7.41 & 45.37 &  8.80 & 45.37 & 14.35 & 45.37 & 24.07 & 45.37 & 45.37 \\
+\grayline
+\multicolumn{1}{|l|}{\hspace{28pt}RAMB18}      &  1.16 &  1.39 &  1.16 &  1.39 &  0.69 &  1.39 &  0.69 &  1.39 &  1.39 &  1.39 &  1.39 \\
+\hline
+\end{tabular}

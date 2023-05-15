@@ -8,6 +8,11 @@
 \usepackage{graphicx}
 \usepackage{csquotes}
 \usepackage{makecell}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{siunitx}
+\usepackage{tabularx}
+\usepackage{longtable}
 \usepackage{amsmath}
 \usepackage{caption}
 \usepackage{subcaption}
@@ -15,6 +20,8 @@
 \usepackage{xspace}
 \usepackage{pgfplots}
 \usepackage{tikz}
+\usepackage{circuitikz}
+\usepackage{tikz-timing}
 \usepackage[export]{adjustbox}
 
 \usetheme[progressbar=frametitle]{metropolis}
@@ -23,6 +30,7 @@
 \captionsetup[figure]{font=tiny,labelsep=none}
 \usetikzlibrary{automata, arrows.meta, shapes.geometric, calc, positioning, fit}
 
+\newcommand{\grayline}{\arrayrulecolor{gray!40}\hline\arrayrulecolor{black}}
 \newcommand{\cmark}{\ding{51}\xspace}%
 \newcommand{\xmark}{\ding{55}\xspace}%
 \newcommand{\code}[1]{\texttt{\detokenize{#1}}}
@@ -153,7 +161,7 @@
           \centering
           \includegraphics[width=3cm]{img/halide-sliding-window.png}
           \begin{itemize}
-            \item[\cmark] Producer-consumer locality
+            \item[\cmark\cmark] Producer-consumer locality
             \item[\xmark\xmark] Parallelization
             \item[\cmark\cmark] Recomputation
           \end{itemize}
@@ -270,10 +278,10 @@
             \item \codecpp{IRVisitor}: traverse the IR nodes and perform some action on it (like generating code), but without modifying them.
             \item \codecpp{IRMutator}: traverse the IR nodes to modify them.
           \end{itemize}
-    \item Two kinds of nodes, analogously to C:
+    \item Two kinds of IR nodes, analogously to C:
           \begin{itemize}
             \item \textbf{Expressions} (\codecpp{ExprNode}): represent some value and have some type (e.g. \codecpp{x + 3})
-            \item \textbf{Statements} (\codecpp{StmtNode}): side-effecting pieces of code that do not represent a value (e.g. \codecpp{assert(x > 3)}).
+            \item \textbf{Statements} (\codecpp{StmtNode}): side-effecting pieces of code that do not represent a value (e.g. \codecpp{assert(x > 3)}, \codecpp{store}).
           \end{itemize}
     \item Type system: signed and unsigned ints, IEEE fp numbers, opaque pointers (like \codecpp{void *}) and \code{bfloat}
   \end{itemize}
@@ -298,7 +306,7 @@
   \end{figure}
 \end{frame}
 
-\section{MLIR}
+\section{Multi-Level Intermediate Representation (MLIR)}
 
 \begin{frame}{\raisebox{-0.25\height}{\includegraphics[height=0.5cm]{img/mlir-identity-09.png}}}
   \begin{itemize}
@@ -356,7 +364,7 @@
   \end{figure}
 \end{frame}
 
-\section{CIRCT}
+\section{Circuit IR Compilers and Tools (CIRCT)}
 
 \begin{frame}{\raisebox{-0.25\height}{\includegraphics[height=0.5cm]{img/circt-logo.png}} CIRCT}
   \begin{itemize}
@@ -659,13 +667,121 @@
   \end{itemize}
 \end{frame}
 
+\section{Bugs and issues}
+
+\begin{frame}[fragile]{Bugs and issues}
+  \begin{itemize}
+    \item MLIR and CIRCT are still experimental projects.
+    \item MLIR SCF $\rightarrow$ Calyx pass and Calyx $\rightarrow$ HW dialects had \textbf{never been tested on real hardware} (or even cycle-accurate simulator)
+    \item Numerous bugs were found. Waveform debugging was essential.
+    \item Bugs were fixed, submitted to upstream, and already merged:
+          \begin{itemize}
+            \item Add support for multiple \codecpp{calyx::AssignOp} with guards to the same destination
+                  \begin{figure}
+                    \scalebox{.5}{\input{fig/multiple_guards_assign.tex}}
+                  \end{figure}
+            \item Clock-enable with the \code{done} signal when writing to Calyx registers
+                  \begin{figure}[H]
+                    \centering
+                    \includegraphics[width=8cm,valign=b]{img/bug_write_en_done.png}
+                    $\implies$
+                    \adjustbox{valign=c}{\scalebox{.5}{\input{fig/write_en_done_fix.tex}}}
+                  \end{figure}
+            \item \codecpp{calyx::NotLibOp} was lowered incorrectly (\textit{XOR} with 0s instead of 1s)
+            \item Read/write-enable signals of external memories were left unconnected
+          \end{itemize}
+  \end{itemize}
+\end{frame}
+
 \section{Evaluation}
 
 \begin{frame}{Evaluation}
+  \begin{itemize}
+    \item Avnet Ultra96-V2 Board with 2 GB LPDDR4:
+          \begin{table}[H]
+            \centering
+            \scalebox{.5}{\input{fig/table_ps.tex}}
+            \scalebox{.5}{\input{fig/table_pl.tex}}
+          \end{table}
+    \item 3 Halide kernels used to evaluate the generated RTL code
+    \item For each kernel, resource utilization and execution time analysis performed
+    \item Each kernel has been run three times and the average time has been taken
+    \item The result (output data) of RTL execution binary-compared with CPU execution (\textquote{golden model})
+          \begin{itemize}
+            \item Timing of CPU execution taken with vanilla kernel without Halide scheduling directives (defaults to \textit{inline}/\textit{total fusion})
+          \end{itemize}
+    \item For all the kernels, the ${\SI{150}{\mega\hertz}}$ target frequency was met.
+          \begin{itemize}
+            \item Note: ${\SI{150}{\mega\hertz}}$ on the FPGA, while the CPU runs at ${\SI{1.5}{\giga\hertz}}$, 10 times faster
+          \end{itemize}
+  \end{itemize}
 
 \end{frame}
 
-\section{Conclusions and future work}
+\begin{frame}{\textit{Test load} kernel}
+  \begin{itemize}
+    \item Tests the load and store from external memory functionality (32-bit ints):
+          \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.3\textwidth}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{5}{5}]{cpp}{fig/test_load_kernel.cpp}
+            \end{minipage}
+          \end{figure}
+    \item Evaluation: vect. factors: powers of two from 1 to 32. AXI data bus widths: vector size and max (1024).
+    \item Resource usage:
+          \begin{table}[Ht]
+            \makebox[\linewidth]{
+              \scalebox{.333}{\input{fig/test_load_clb_usage.tex}}
+              \scalebox{.333}{\input{fig/test_load_bram_usage.tex}}
+              \scalebox{.333}{\input{fig/test_load_arith_usage.tex}}
+            }
+          \end{table}
+          \begin{itemize}
+            \item \textbf{1024-bit AXI} leads to a \textbf{considerable increase in CLB LUT as Logic}: extra logic needed to drive the data bus wires in the \textit{Calyx external memory to AXI converter}.
+            \item Native vector AXI width size: $39.29\%$ up to $58.21\%$ and $28.81\%$ up to $40.78\%$, for vectorization factors $1$ and $32$, respectively.
+          \end{itemize}
+    \item Execution time: buffer with $4 \times 1024 \times 1024$ 32-bit ints (\qty{16}{\mega\byte} in total).
+          \begin{table}[H]
+            \centering
+            \scalebox{.333}{\input{fig/test_load_exec_time.tex}}
+          \end{table}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\textit{Test load div int8} kernel}
+  \begin{itemize}
+    \item Take advantage of vectorization support by using 8-bit integers:
+          \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.3\textwidth}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{5}{5}]{cpp}{fig/test_load_div_int8.cpp}
+            \end{minipage}
+          \end{figure}
+    \item Evaluation: vect. factors powers of two from 4 to 128, and native and 1024-bit AXI data bus width.
+    \item Resource usage:
+          \begin{table}[Ht]
+            \makebox[\linewidth]{
+              \scalebox{.333}{\input{fig/test_load_div_int8_clb_usage.tex}}
+              \scalebox{.333}{\input{fig/test_load_div_int8_bram_usage.tex}}
+              \scalebox{.333}{\input{fig/test_load_div_int8_arith_usage.tex}}
+            }
+          \end{table}
+          \begin{itemize}
+            \item Same as before: increase in the logic when native vector AXI vs 1024-bits.
+            \item Division by constant, the synthesizer used logic and did \textbf{not use DSPs} to implement it.
+          \end{itemize}
+    \item Execution time: buffer with $32 \times 1024 \times 1024$ 8-bit ints.
+          \begin{table}[H]
+            \centering
+            \scalebox{.333}{\input{fig/test_load_div_int8_exec_time.tex}}
+          \end{table}
+          \begin{itemize}
+            \item After vect. factor of 32, it runs faster than the CPU
+            \item With vector. factor of 128 elements (1024-bit AXI accesses), it is \textbf{$\times 2.6$ faster}.
+          \end{itemize}
+  \end{itemize}
+\end{frame}
+
 
 
 \end{document}

@@ -1,0 +1,14 @@
+\begin{tikztimingtable}[timing/inline node/.style={coordinate,shift={(0.05, 0.5)}}]
+  clock                                   & 10{2C}G          \\
+  \code{write_en}\textsubscript{\code{B}} & 6C8C6C           \\
+  \code{done_reg}\textsubscript{\code{B}} & 10C N(A) 10C           \\
+  \code{clock_en}\textsubscript{\code{B}} & 6C4C10C          \\
+  FSM state                               & 6D{[teal,font=\bfseries]A}8D{[blue,font=\bfseries]B} N(B) 6D{[red,font=\bfseries]C}  \\
+  \extracode
+    \vertlines[help lines,opacity=0.4]{2,6,10,14,18}
+    \draw[orange, semithick]
+      (A) ellipse (.4 and .8) +(0, -0.8) coordinate (Ax)
+      (B) ellipse (.4 and .8) +(0, +0.8) coordinate (Bx);
+    \draw [orange, semithick, ->]
+      (Ax) parabola [bend pos=0.5] (Bx);
+\end{tikztimingtable}

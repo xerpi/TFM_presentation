@@ -1,0 +1,23 @@
+\begin{tikzpicture}[node distance=0.5cm and 0.5cm]
+\tikzset{mux 2by1/.style={muxdemux,muxdemux def={Lh=2, NL=2, Rh=1,NB=0,NT=1, w=1}}}
+  \node [font=\small] (G0) at (0,0) {$guard_0$};
+  \node [font=\small] (G1) at (2,0) {$guard_1$};
+  \node [font=\small] (GN) at (4,0) {$guard_N$};
+
+  \node [mux 2by1] (M0) [below of=G0, anchor=tpin 1] {};
+  \node [mux 2by1] (M1) [below of=G1, anchor=tpin 1] at (2,-0.5) {};
+  \node [mux 2by1] (MN) [below of=GN, anchor=tpin 1] at (4,-1.0) {};
+
+  \foreach \i in {0,1,N} {
+    \foreach \x [count=\c] in {0,...,1} {
+      \node [right, font=\tiny] at ($(M\i.lpin \c)+(0.2,0)$) {\x};
+    }
+    \draw (M\i.tpin 1) |- (G\i.south);
+    \node [left, font=\small] at (M\i.lpin 2) {$in_\i$};
+  }
+  \draw (M0.rpin 1) |- (M1.lpin 1);
+  \draw[thick, dotted] (M1.rpin 1) |- (MN.lpin 1);
+
+  \node [left, font=\small] at (M0.lpin 1) {$0$};
+  \node [right, font=\small] at (MN.rpin 1) {$out$};
+\end{tikzpicture}

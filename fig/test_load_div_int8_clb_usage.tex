@@ -1,0 +1,21 @@
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-12}
+\multicolumn{1}{c|}{} & \multicolumn{11}{c|}{\textbf{Vectorization factor}} \\
+\cline{2-12}
+\multicolumn{1}{c|}{} & \multicolumn{2}{c|}{\textbf{4}} & \multicolumn{2}{c|}{\textbf{8}} & \multicolumn{2}{c|}{\textbf{16}} & \multicolumn{2}{c|}{\textbf{32}} & \multicolumn{2}{c|}{\textbf{64}} & \multicolumn{1}{c|}{\textbf{128}} \\
+\hline
+\multicolumn{1}{|c|}{\textbf{AXI data bus size (bits)}} & 32 & 1024 & 64 & 1024 & 128 & 1024 & 256 & 1024 & 512 & 1024 & 1024 \\
+\hline
+\multicolumn{1}{|l|}{CLB LUTs}                        & 39.33 & 51.47 & 39.77 & 53.16 & 39.60 & 53.73 & 43.47 & 55.35 & 49.68 & 58.11 & 62.14 \\
+\grayline
+\multicolumn{1}{|l|}{\hspace{25pt}LUT as Logic}       & 35.69 & 47.80 & 36.13 & 49.50 & 36.02 & 50.06 & 39.82 & 51.69 & 46.01 & 54.44 & 58.48 \\
+\grayline
+\multicolumn{1}{|l|}{\hspace{25pt}LUT as Memory}      &  8.92 &  8.98 &  8.92 &  8.98 &  8.76 &  8.98 &  8.93 &  8.98 &  8.98 &  8.98 &  8.98 \\
+\hline
+\multicolumn{1}{|l|}{CLB Registers}                   & 28.81 & 39.36 & 29.43 & 39.41 & 29.99 & 39.49 & 32.07 & 39.66 & 34.95 & 40.00 & 40.69 \\
+\grayline
+\multicolumn{1}{|l|}{\hspace{25pt}Register as FF}     & 28.79 & 39.34 & 29.40 & 39.38 & 29.97 & 39.47 & 32.05 & 39.64 & 34.92 & 39.98 & 40.66 \\
+\grayline
+\multicolumn{1}{|l|}{\hspace{25pt}Register as Latch}  &  0.02 &  0.02 &  0.03 &  0.03 &  0.02 &  0.03 &  0.03 &  0.03 &  0.03 & 0.03 &  0.03 \\
+\hline
+\end{tabular}
