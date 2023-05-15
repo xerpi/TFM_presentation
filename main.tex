@@ -86,7 +86,7 @@
 
 \begin{frame}[fragile]{Halide}
   \begin{itemize}
-    \item Main idea: \textbf{decouple} the \textcolor{blue}{\textbf{\textit{algorithm}}} (\textquote{what needs to be computed}) definition from its \textcolor{blue}{\textbf{\textit{schedule}}} (\textquote{how it should be computed})
+    \item Main idea: \textbf{decouple} the \textcolor{blue}{\textbf{\textit{algorithm}}} definition (\textquote{what needs to be computed}) from its \textcolor{blue}{\textbf{\textit{schedule}}} (\textquote{how it should be computed})
     \item W/o changing algorithm, explore different optimizations strategies (loop nesting and loop fusion, tiling, recomputation and storage balancing, vectorization, parallelism, \ldots)
   \end{itemize}
   \begin{figure}[H]
@@ -447,7 +447,7 @@
 \begin{frame}{Marking loops to be offloaded to an accelerator}
   \begin{enumerate}
     \item \codecpp{InjectAcceleratorOffload} \codecpp{IRMutator} traverses IR and marks \code{For} IR nodes with new \codecpp{enum DeviceAPI::XRT}.
-    \item For each marked \code{For}:
+    \item For each marked \code{For} loop:
           \begin{enumerate}
             \item Pass the loop \codecpp{Stmt} and kernel name to virtual class called \codecpp{CodeGen_Accelerator_Dev}
                   \begin{itemize}
