@@ -1,0 +1,13 @@
+\begin{tabular}{|c|c|c|c|}
+\cline{2-4}
+\multicolumn{1}{c|}{} & \multicolumn{3}{c|}{\textbf{Tile size}} \\
+\cline{2-4}
+\multicolumn{1}{c|}{} & \textbf{8x8} & \textbf{16x16} & \textbf{32x32} \\
+\hline
+\codecpp{tmp}    & $4 \times 32$          & $4 \times 32$           & $4 \times 32$ \\
+\grayline
+\codecpp{blur_x} & $8 \times 4 \times 32$ & $16 \times 4 \times 32$ & $32 \times 4 \times 32$ \\
+\hline
+Total            & 1152 bits              & 2176 bits               & 4224 bits \\
+\hline
+\end{tabular}

@@ -782,6 +782,50 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}{\textit{Test blur3x3 sliding window} kernel (1)}
+  \begin{itemize}
+    \item 3x3 blur filter on a 2D array of 32-bit ints. Tries to exploit most of the FPGA characteristics and supported features implemented.
+          \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.5\textwidth}
+              \inputminted[tabsize=2,frame=single,rulecolor=gray,fontsize=\fontsize{5}{5}]{cpp}{fig/test_blur3x3_sliding_window.cpp}
+            \end{minipage}
+          \end{figure}
+    \item Exploit device locality and loads from external memory by using \textbf{sliding windows within tiling} with device-local buffers.
+    \item Evaluation: since \textbf{vector accesses to local memories were not implemented for this thesis}, \textbf{vectorization can not be used}. Different \textbf{tile sizes} will be evaluated: $8 \times 8$, $16 \times 16$ and $32 \times 32$.
+          \begin{itemize}
+            \item AXI data bus width was set to the element size (32 bits)
+          \end{itemize}
+  \end{itemize}
+\end{frame}
 
+\begin{frame}{\textit{Test blur3x3 sliding window} kernel (2)}
+  \begin{itemize}
+    \item Resource usage:
+          \begin{table}[Ht]
+            \makebox[\linewidth]{
+              \scalebox{.4}{\input{fig/test_blur3x3_sliding_window_clb_logic_usage.tex}}
+              \scalebox{.4}{\input{fig/test_blur3x3_sliding_window_local_mem_requirements.tex}}
+              \scalebox{.4}{\input{fig/test_blur3x3_sliding_window_bram_usage.tex}}
+              \scalebox{.4}{\input{fig/test_blur3x3_sliding_window_bram_primitives_usage.tex}}
+              \scalebox{.4}{\input{fig/test_blur3x3_sliding_window_arith_usage.tex}}
+            }
+          \end{table}
+          \begin{itemize}
+            \item CLB utilization barely changes: from control PoV the only change are loop boundaries (constants).
+            \item Sliding buffers allocated as distributed memories in the CLBs (as SRAMs).
+            \item Multiplication of $3\times 3 = 9$ input elements for each output using DSPs. Two divs constant $3$ using logic as before.
+          \end{itemize}
+    \item Execution time: buffer with $4096 \times 4096$ 32-bit ints.
+          \begin{table}[H]
+            \centering
+            \scalebox{.333}{\input{fig/test_blur3x3_sliding_window_exec_time.tex}}
+          \end{table}
+          \begin{itemize}
+            \item \textbf{Local buffers and vectorization is currently unsupported}: kernel code not vectorized and accesses to external memory limited \textbf{32 bits}. Execution on the FPGA 10 times slower than on the CPU.
+            \item Execution time reduces when increasing the tile size: thanks to the \textbf{reduction of re-computation of tile boundaries}.
+          \end{itemize}
+  \end{itemize}
+\end{frame}
 
 \end{document}
