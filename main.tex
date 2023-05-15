@@ -828,4 +828,55 @@
   \end{itemize}
 \end{frame}
 
+\section{Conclusions and future work}
+
+\begin{frame}{Conclusions}
+  \begin{itemize}
+    \item FPGAs are \textbf{highly flexible devices}. Enable the power of reconfigurable hardware for a wide range of applications.
+    \item However, developing FPGA applications is a \textbf{complex task}: requires a deep understanding of both hardware and software design flows.
+    \item \textbf{DSLs} have emerged to help simplify the development process by providing \textbf{higher levels of abstraction} and focusing on specific problem domains.
+    \item \textbf{Halide} is a popular DSL designed for expressing \textbf{image and array processing} and computational photography algorithms.
+    \item In this thesis, a \textbf{new backend} for Halide which \textbf{targets FPGAs} has been developed.
+          \begin{itemize}
+            \item \textbf{Generic RTL kernel} is generated. Then wrapped for Xilinx FPGA devices.
+          \end{itemize}
+    \item Instead of directly generating RTL or HLS code, \textbf{generic MLIR} is first generated.
+          \begin{itemize}
+            \item \textbf{Can target many devices and acceleration APIs}
+          \end{itemize}
+    \item \textbf{Novel flow} using \textbf{CIRCT} and \textbf{Calyx} to convert generic MLIR has been implemented.
+          \begin{itemize}
+            \item Leverages the flexibility and extensibility of MLIR and CIRCT
+          \end{itemize}
+    \item Results presented in this thesis show that the approach is \textbf{viable} and can be used to generate efficient FPGA code from Halide programs.
+          \begin{itemize}
+            \item Still \textbf{work to do} and features to be added to improve the generated code.
+          \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Future work}
+  \begin{itemize}
+    \item Support vectorized accesses to local memory
+    \item Improved support for MLIR's \code{arith} \textit{min} and \textit{max} operations
+    \item Generalize \codecpp{MemRefType} lowering
+    \item Proper support for \codecpp{scf::IfOp} in CIRCT's \code{SCFToCalyx} pass
+    \item Implement lowering of \codecpp{calyx::ParOp} in \code{CalyxToHW}
+    \item Add floating-point support in the MLIR to RTL lowering
+    \item Avoid useless pipeline stages after \code{comb} canonicalization of lowered pipelined Calyx operations
+    \item Emit loops and memory accesses using MLIR's \code{affine} dialect
+    \item Use CIRCT's static scheduling infrastructure to lower MLIR to Calyx
+    \item Add AXI-Stream support
+    \item Coalescing buffer to implement write-combining
+    \item Experiment with HLS code generation from MLIR
+    \item Halide autoschedulers for FPGA targets
+    \item $\ldots$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{}
+  \centering \Large
+  \emph{Thank you for your attention.}
+\end{frame}
+
 \end{document}
